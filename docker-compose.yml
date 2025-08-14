@@ -3,7 +3,7 @@
 services:
   api:
     build:
-      context: ./LazyLoading
+      context: ./server
       dockerfile: LazyLoading.Api/Dockerfile
     container_name: lazyloading-api
     restart: unless-stopped

@@ -11,7 +11,7 @@ Before you begin, ensure you have the following installed:
 
 ## Project Structure
 
-- `LazyLoading/` - .NET Core backend solution
+- `server/` - .NET Core backend solution
   - `LazyLoading.Api` - REST API project
   - `LazyLoading.Application` - Business logic and application services
   - `LazyLoading.Domain` - Domain entities and business rules

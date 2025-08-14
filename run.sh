@@ -12,7 +12,7 @@ show_help() {
     echo "Usage: ./run.sh [action]"
     echo ""
     echo "Actions:"
-    echo "  start    - Start the application stack (default)"
+    echo "  start    - Start the application stack"
     echo "  stop     - Stop the application stack"
     echo "  restart  - Restart the application stack"
     echo "  rebuild  - Rebuild and start the application stack"
@@ -27,6 +27,7 @@ start_stack() {
     echo -e "\e[32mStarting $PROJECT_NAME stack...\e[0m"
     docker-compose up -d
     echo -e "\e[32mStack is now running! Access the API at http://localhost:8080\e[0m"
+    echo -e "\e[32mFrontend UI is available at http://localhost:3000\e[0m"
     echo -e "\e[32mPostgreSQL is available at localhost:5432\e[0m"
 }
 
@@ -48,6 +49,9 @@ rebuild_stack() {
     echo -e "\e[33mRebuilding $PROJECT_NAME stack...\e[0m"
     docker-compose up -d --build
     echo -e "\e[32mStack has been rebuilt and is now running!\e[0m"
+    echo -e "\e[32mAccess the API at http://localhost:8080\e[0m"
+    echo -e "\e[32mFrontend UI is available at http://localhost:3000\e[0m"
+    echo -e "\e[32mPostgreSQL is available at localhost:5432\e[0m"
 }
 
 # Function to show container logs
@@ -87,7 +91,7 @@ clean_stack() {
 }
 
 # Parse command line arguments
-ACTION=${1:-start}
+ACTION=${1:-help}
 
 # Execute the requested action
 case "$ACTION" in

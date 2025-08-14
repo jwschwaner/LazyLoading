@@ -2,7 +2,7 @@
 # run.ps1 - Script to manage the LazyLoading application stack
 
 param (
-    [string]$action = "start"
+    [string]$action = "help"
 )
 
 $ErrorActionPreference = "Stop"
@@ -15,7 +15,7 @@ function Show-Help {
     Write-Host "Usage: ./run.ps1 [action]"
     Write-Host ""
     Write-Host "Actions:"
-    Write-Host "  start    - Start the application stack (default)"
+    Write-Host "  start    - Start the application stack"
     Write-Host "  stop     - Stop the application stack"
     Write-Host "  restart  - Restart the application stack"
     Write-Host "  rebuild  - Rebuild and start the application stack"
@@ -33,6 +33,7 @@ function Start-Stack {
         exit $LASTEXITCODE
     }
     Write-Host "Stack is now running! Access the API at http://localhost:8080" -ForegroundColor Green
+    Write-Host "Frontend UI is available at http://localhost:3000" -ForegroundColor Green
     Write-Host "PostgreSQL is available at localhost:5432" -ForegroundColor Green
 }
 
@@ -59,6 +60,9 @@ function Rebuild-Stack {
         exit $LASTEXITCODE
     }
     Write-Host "Stack has been rebuilt and is now running!" -ForegroundColor Green
+    Write-Host "Access the API at http://localhost:8080" -ForegroundColor Green
+    Write-Host "Frontend UI is available at http://localhost:3000" -ForegroundColor Green
+    Write-Host "PostgreSQL is available at localhost:5432" -ForegroundColor Green
 }
 
 function Show-Logs {
