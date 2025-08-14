@@ -1,41 +1,61 @@
+using LazyLoading.Application.Abstractions;
+using LazyLoading.Application.Matches.Queries.GetMatchesPage;
+using LazyLoading.Infrastructure.Persistence;
+using LazyLoading.Infrastructure.Repositories;
+using LazyLoading.Infrastructure.Seeding;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+    
+builder.Services.AddMediatR(typeof(GetMatchesPageQuery));
+builder.Services.AddScoped<IMatchReadRepository, MatchReadRepository>();
+
+builder.Services.AddCors(opt =>
+{
+    opt.AddDefaultPolicy(p =>
+        p.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCors();
+
+using (var scope = app.Services.CreateScope())
 {
-    app.MapOpenApi();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
 }
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
+app.MapGet("/api/matches", async (int? limit, string? cursor, IMediator mediator, CancellationToken ct) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var page = Math.Clamp(limit ?? 100, 1, 100);
+    var result = await mediator.Send(new GetMatchesPageQuery(page, cursor), ct);
+    return Results.Ok(result);
+});
 
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+app.MapPost("api/matches/seed", async (int? count, AppDbContext dbContext, CancellationToken ct) =>
+{
+    var n = Math.Clamp(count ?? 100, 1, 10000);
+    var added = await MatchSeeder.SeedAsync(dbContext, n, null, ct);
+    return Results.Ok(new { added });
+});
+
+app.MapDelete("api/matches", async (AppDbContext dbContext, CancellationToken ct) =>
+{
+    var deleted = await dbContext.Matches.ExecuteDeleteAsync(ct);
+    return Results.Ok(new { deleted });
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
