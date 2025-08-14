@@ -9,7 +9,9 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"),
+        b => b.MigrationsAssembly("LazyLoading.Infrastructure"))
+);
     
 builder.Services.AddMediatR(typeof(GetMatchesPageQuery));
 builder.Services.AddScoped<IMatchReadRepository, MatchReadRepository>();
