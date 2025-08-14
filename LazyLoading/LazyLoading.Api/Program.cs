@@ -30,7 +30,7 @@ builder.Services.AddScoped<IMatchReadRepository, MatchReadRepository>();
 builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(p =>
-        p.WithOrigins("http://localhost:5173")
+        p.WithOrigins("http://localhost:5173", "http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod());
 });

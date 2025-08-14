@@ -25,6 +25,19 @@ services:
     networks:
       - lazyloading-network
 
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: lazyloading-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - lazyloading-network
+
   db:
     image: postgres:16-alpine
     container_name: lazyloading-db
