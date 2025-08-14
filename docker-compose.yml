@@ -1,0 +1,48 @@
+﻿version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./LazyLoading
+      dockerfile: LazyLoading.Api/Dockerfile
+    container_name: lazyloading-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=LazyLoading;Username=postgres;Password=postgres;
+    healthcheck:
+      test: ["CMD", "dotnet", "--info"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - db
+    networks:
+      - lazyloading-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: lazyloading-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=LazyLoading
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - lazyloading-network
+
+networks:
+  lazyloading-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

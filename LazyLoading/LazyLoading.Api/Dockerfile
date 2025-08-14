@@ -1,5 +1,4 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -23,4 +22,11 @@ RUN dotnet publish "./LazyLoading.Api.csproj" -c $BUILD_CONFIGURATION -o /app/pu
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "LazyLoading.Api.dll"]
+
+# Create a script to wait for the database and start the API
+RUN echo '#!/bin/sh \n\
+echo "Starting LazyLoading API..." \n\
+exec dotnet LazyLoading.Api.dll \n\
+' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]

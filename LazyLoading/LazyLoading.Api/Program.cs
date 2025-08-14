@@ -5,15 +5,26 @@ using LazyLoading.Infrastructure.Repositories;
 using LazyLoading.Infrastructure.Seeding;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Explicitly configure Kestrel to listen on port 8080 for all interfaces
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(8080);
+});
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"),
         b => b.MigrationsAssembly("LazyLoading.Infrastructure"))
 );
-    
-builder.Services.AddMediatR(typeof(GetMatchesPageQuery));
+
+// Updated MediatR registration to be compatible with MediatR 13
+builder.Services.AddMediatR(cfg => {
+    cfg.RegisterServicesFromAssembly(typeof(GetMatchesPageQuery).Assembly);
+});
+
 builder.Services.AddScoped<IMatchReadRepository, MatchReadRepository>();
 
 builder.Services.AddCors(opt =>
@@ -24,13 +35,26 @@ builder.Services.AddCors(opt =>
             .AllowAnyMethod());
 });
 
+// Add basic health checks
+builder.Services.AddHealthChecks();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "LazyLoading API v1");
+    options.RoutePrefix = string.Empty;
+});
+
+// Add health check endpoint
+app.MapHealthChecks("/health");
+
+// Redirect root URL to Swagger UI
+app.MapGet("/", () => Results.Redirect("/index.html"));
 
 app.UseCors();
 
