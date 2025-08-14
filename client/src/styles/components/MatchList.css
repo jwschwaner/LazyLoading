@@ -1,0 +1,71 @@
+/* MatchList styles */
+.matches-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 1s ease;
+}
+
+.matches-header {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.matches-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.matches-list {
+  height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.loading-indicator {
+  padding: 24px;
+  text-align: center;
+  color: #64748b;
+  font-weight: 500;
+  animation: pulse 2s infinite;
+}
+
+.end-indicator {
+  padding: 24px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  background: #f8fafc;
+  font-style: italic;
+}
+
+.empty-state {
+  padding: 60px 24px;
+  text-align: center;
+  color: #64748b;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+.empty-state-text {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .matches-list {
+    height: 400px;
+  }
+}

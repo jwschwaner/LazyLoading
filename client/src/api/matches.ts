@@ -1,15 +1,5 @@
 import { api } from "./client";
-
-export type MatchDto = {
-    id: string;
-    kickoffAt: string;
-    homeTeam: string;
-    awayTeam: string;
-    homeScore: number;
-    awayScore: number;
-};
-
-export type PagedResponse<T> = { items: T[]; nextCursor?: string | null };
+import type { MatchDto, PagedResponse } from "../types/match";
 
 export async function fetchMatches(cursor?: string | null, limit = 10): Promise<PagedResponse<MatchDto>> {
   const params: Record<string, string | number> = { limit };
